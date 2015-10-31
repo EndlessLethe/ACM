@@ -2,33 +2,30 @@
 
 #define MAX ******
 
-int f(int a, int* val);
+long long int f(int a, long long int* val);
 
 int main()
 {
-	int n = 0, i = 0, k = 0;
-	scanf("%d",&n);
-	int res[MAX], val[MAX];
-	while (n != ****) {
-		i = 0;
-		res[i++] = f(n, val);
-		scanf("%d",&n);
+	int a = 0, i = 0, k = 0;
+	long long int res[MAX], val[MAX];
+	while (scanf("%d",&a) != ****) {
+		res[i++] = f(a, val);
 	}
 
 	for (k = 0; k < i; k++) {	
-		printf("%d\n", res[k]);	
+		printf("%lld\n", res[k]);	
 	}
 }
 
-int f(int a, int* val) {
+long long int f(int a, long long int* val) {
 	if (val[a-1]){
 		;
 	}
-	if else (a < ***) {
+	else if (a < ***) {
 		val[a-1] = 1;
 	}
 	else {
-	****
+	****val[a-1] = f(a-1, val) + f(a-2, val);
 	}
 	return val[a-1];
 }

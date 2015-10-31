@@ -31,6 +31,7 @@ long long int f(long long int a, long long int* val) {
 	}
 	else if (a % 4 == 0){
 		val[a-1] = f(a-1, val) + a/4 ;
+		//理解有问题，不是1年多一只，而是一年比前年多一只 
 	}
 	else {
 		val[a-1] = f(a-1, val) + a/4 + 1 ;
