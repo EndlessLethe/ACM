@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifdef LOCAL
 #define MAX 8000000
+#endif
 
 long long int f(int a, long long *val, long long int* num);
 long long int fac(int a, long long int* num);
