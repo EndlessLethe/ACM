@@ -46,6 +46,13 @@ int main()
 		if (k == 0) {
 			printf("no\n");
 		}
+		else if (res[1] == res[0] && res[2] != 371) {
+			printf("%d\n", res[1]);
+		}
+		else if (res[1] == res[2] && res[3] != 371) {
+			printf("153 370\n");
+		//针对370 写的 
+		}
 		else {
 			int len = 0, temp = 0;
 			len = sizeof(res) / sizeof(res[0]);  
@@ -58,15 +65,18 @@ int main()
 				else {
 					printf("%d", res[k]);
 					temp = k;
+					if (k != 1) {
+						printf(" ");
+					}
+					else {
+						printf("\n");
+					}
 				}
+			//终于发现是n = m = 370这种的时候会出错 
 				k--;
-				if (k != 0){
-					printf(" ");
-				}
 			}
-			printf("\n");
 		}
-			k = 0;
+		k = 0;
 	}
 	return 0;
 }

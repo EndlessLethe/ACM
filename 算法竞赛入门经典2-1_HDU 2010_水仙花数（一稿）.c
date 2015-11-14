@@ -19,6 +19,7 @@ int main()
 					c++;
 					if ((res[k] = cubesum(a, b, c)) >= m && res[k] <= n) {
 						k++;
+					//这个if很好！ 
 					}
 				}
 			}

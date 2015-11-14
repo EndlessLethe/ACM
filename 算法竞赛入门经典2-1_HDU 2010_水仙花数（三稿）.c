@@ -58,15 +58,17 @@ int main()
 				else {
 					printf("%d", res[k]);
 					temp = k;
+					if (k != 1) {
+						printf(" ");
+					}
+					else {
+						printf("\n");
+					}
 				}
 				k--;
-				if (k != 0){
-					printf(" ");
-				}
 			}
-			printf("\n");
 		}
-			k = 0;
+		k = 0;
 	}
 	return 0;
 }
