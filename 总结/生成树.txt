@@ -1,0 +1,42 @@
+如果连通图G的一个子图是一棵包含G的所有顶点的树,则该子图称为G的生成树(SpanningTree)。
+
+最小瓶颈生成树是一棵让边的最大尽量小的生成树。而最小生成树一定是最小瓶颈生成树（虽然最小瓶颈生成树可能不是最小生成树，但此时的最小生成树依然是最小瓶颈生成树）。瓶颈生成路是瓶颈生成树的一个子图。通过Kruskal算法，我们可以发现，
+1）求最小瓶颈生成树的最长边（即瓶颈），就是求最后一次连边时那条边的长度。
+2）对于是否存在瓶颈不超过K的瓶颈生成树的问题，我们可以去掉超过K的边，再判断图是否联通（跑一次 Kruskal，看是否有未联通的点）。
+3）对于是否存在瓶颈为K的瓶颈生成树的问题，我们可以穷举每一条边。把每一条边分别先合并（？正确性未必能保证）。
+4）对于有多个询问、求不同u和v之间（甚至每两点）的最长边的题目，我们还需要掌握lca倍增法。
+
+
+苗条生成树
+求一个生成树使最大边最小是瓶颈生成树。对于此题，我们枚举每一条边做最小边的情况，找对应的最小生成树的最大边，找出最大边与最小边差值最小的值即可。
+
+
+增量最小生成树
+1）先求出最小生成树并把其他边删除
+2）在新加入u，v之前，先找到原来MST上u-v权值最大的一条边（简单dfs）
+3）再和e比较，删去较大的一条边
+这样我们保证了u、v在联通一条路径的同时，破坏了原来的路径，使得这个图始终是MST
+http://wenku.baidu.com/link?url=PEec_LOjl9kft4GlBCTN2SFeoXSbjaUY0RRAI0VkHJZlC3yV1AiVljKJYUSyFsvc-vWlTeN14cVwv1c8UO1kb-0VBTlnLsD9YvXEb6X58k3
+
+
+
+次短路径和次小生成树 [4]
+这里我们分别讨论次短路径和次小生成树，因为这两个问题有较大的差别——单源最短路和次小生成树没有包含关系。
+次短路径即为u，v两点之间次短的路径。这里有两种算法:
+1)每次维护次短长度和最短长度，只需要一次Dijkstra法就可以求得（严格大于单源最短路的次短路径）
+（参见《挑战程序设计竞赛》）P108 到某个顶点的次短路一定是a.到u的最短路再加上u-v的边，b.到u的次短路再加上u-v的边
+
+2）按照后面求次小生成树一样的方法，我们可以先将单源最短路（对应后面的最小生成树）上的所有边储存在stack里，之后每次删除一条、做一次Dijkstra。这样我们就求出了所有不短于单源最短路的路径。
+注意如果我们想要求严格大于单源最短路的次短路，在有重边的情况下，按照法2不一定能够得到。比如：一条长度为3的链，1=2=3（12，23之间各有两条权值为1的边），13之间还有一条权值为3的边。存在重边时需要把重边去掉。
+去掉重边之后，我们就可以比较所有的“严格次短路”中最短的是哪一条，该算法的正确性显然。这条次短路上对应两个节点的路径和之前删去的边正好构成一个圈，且这两个（边和路径）的权值和之差一定是这些“严格次短路”中最小的。
+
+
+
+参考文献：
+[1]http://www.cnblogs.com/shu-xiaohao/p/3543524.html?utm_source=tuicool
+[2]http://blog.csdn.net/pi9nc/article/details/26616833
+[3]http://wenku.baidu.com/link?url=6jfSNvQfyXb9nKeAlMbFm36lPAvtEg66CAQgAO6QkJ0Jh3b1CyNTU69c-r5BgH0w79ka-NjbSpW8nLgbCa_8NmYQndJXkR-5xwNFxMhbpAe
+[4]https://www.byvoid.com/blog/2-sp-mst/
+[5]http://blog.csdn.net/u013514182/article/details/42649201
+[6]http://blog.csdn.net/jarily/article/details/8779621
+[7]http://wenku.baidu.com/link?url=9mQqTNA6TEN5kRajlIWx7_pF-wwioI4pMstwwNBn21GI0AS4TIX88Z7Pzv5FhLI6rLDU_XtGMxvGWq9F4_bmyNQWBEFrvqv0lPTn97nLgV_

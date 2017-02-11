@@ -1,0 +1,10 @@
+[1]拓扑排序
+[2]松弛操作：http://wenku.baidu.com/link?url=hih4TuXUOkpWA2SHj8DjBc2zBmxA6Rg_2xCSUp7jbYdCUpikhT81CyyxUDNDAXTUHItkb6lRvgaJyEgv-qePXU4bjckrNfCjDiJZNHiFCV_
+[2]Prim算法：http://blog.chinaunix.net/uid-25324849-id-2182922.html
+[3]最短路径算法：http://www.cnblogs.com/luweiseu/archive/2012/07/14/2591533.html
+
+[]Dinic算法(浅谈基于分层思想的网络流算法)：http://wenku.baidu.com/linkurl=mMrWzW6zVEJZUf97cbfNS2XzQadJTXttoR1tG_hMyryKEthF9rLbC0Uc6cQkghfiXbl1mlbvvhKK7LQl8T37SVCnlaVc31mHjomSZpZ-EyS
+[]Dinic算法：http://blog.sina.com.cn/s/blog_6635898a0100qxh7.html#cmt_1939816
+
+
+[]2_SAT：http://blog.csdn.net/zck921031/article/details/7712359
