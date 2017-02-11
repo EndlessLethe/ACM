@@ -1,0 +1,15 @@
+:loop
+makedata.exe
+K.exe
+Kture.exe
+fc a.out b.out
+if %errorlevel%==0 goto loop
+pause 
+
+
+:again
+r > input
+a < input > output.a
+b < input > output.b
+fc output.a ouptut.b > nul
+if not errorlevel 1 goto again
