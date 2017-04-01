@@ -1,5 +1,11 @@
-long long int sum[MAX];//可以同时维护很多个值，不仅仅是sum 
 int p[MAX];
+int findSet (int x) {
+	return pa[x] != x ? pa[x] = findSet(pa[x]) : x;
+}
+//以上是两行并查集 
+
+
+int sum[MAX];//可以同时维护很多个值，不仅仅是sum 
 
 int find(int x) {
 	if (p[x] < 0) return x;

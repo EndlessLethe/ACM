@@ -63,7 +63,8 @@ void rotate(Node* &o, int d) {
 	o = k;
 }
 
-void insert(Node* &o, int x) {//在以o为根的子树中插入键值x 
+//在以o为根的子树中插入键值x
+void insert(Node* &o, int x) { 
 	if (o == NULL) o = new Node(x);
 	else {
 		int d = (x < o->v ? 0 : 1);
@@ -94,7 +95,8 @@ void remove(Node* &o, int x) {
 	if (o != NULL) o->maintain();
 }
 
-int find(Node* o, int x) {//查找某一元素是否存在
+//在insert和remove前查找某一元素是否存在
+int find(Node* o, int x) {
 	while (o != NULL) {
 		int d = o->cmp(x);
 		if (d == -1) return 1;
@@ -103,7 +105,8 @@ int find(Node* o, int x) {//查找某一元素是否存在
 	return 0;
 }
 
-int kth(Node* o, int k) {//查询第k大
+//查询第k大
+int kth(Node* o, int k) {
 	if (o == NULL || k < 0 || k > o->s) return 0;
 	int s = (o->ch[1] == NULL ? 0 : o->ch[1]->s);
 	if (k == s+1) return o->v;
@@ -111,18 +114,20 @@ int kth(Node* o, int k) {//查询第k大
 	else return kth(o->ch[0], k-s-1);
 }
 
-void mergeto(Node* &src, Node* &dest) {
-	if (src->ch[0] != NULL) mergeto(src->ch[0], dest);
-	if (src->ch[1] != NULL) mergeto(src->ch[1], dest);
+//将src逐一插入到dest中,可以在调用之前“启发式”一下(比较元素数量)
+//复杂度O(src log dest) 
+void merge(Node* &src, Node* &dest) {
+	if (src->ch[0] != NULL) merge(src->ch[0], dest);
+	if (src->ch[1] != NULL) merge(src->ch[1], dest);
 	insert(dest, stc->v);
 	delete src;
 	src = NULL;
 }
 
 
-void removetree(Node* &x) {
-	if (x->ch[0] != NULL) removetree(x->ch[0]);
-	if (x->ch[1] != NULL) removetree(x->ch[1]);
+void removeTree(Node* &x) {
+	if (x->ch[0] != NULL) removeTree(x->ch[0]);
+	if (x->ch[1] != NULL) removeTree(x->ch[1]);
 	delete x;
 	x = NULL;
 }

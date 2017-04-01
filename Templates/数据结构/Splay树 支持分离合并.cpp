@@ -3,6 +3,12 @@ Author        :EndlessLethe
 Created Time  :2016/7/20 15:49:41
 File Name     :UVa 11922 【splay】.cpp
 Description   :
+主要支持以下操作：
+1.splay 将左数第k个元素旋转到根（不改变中序遍历/保持原本的大小关系）
+2.split 把第k小的元素伸展到根，然后断开树根及其右子树的连接关系
+3.merge 合并left和right。假设left的所有元素比right小（才能保证有序）。
+  注意：right可以为null，left不可以
+4.pushDown 如果该节点有标记，则执行操作并下放标记 
 ************************************************ */
 
 #include <stdio.h>
@@ -22,18 +28,19 @@ using namespace std;
 
 struct Node {
 	Node *ch[2];
-	int v, s;
+	int v = 0, s;//v在这里是1到n，其他地方可能是传入的字符串str[v]
 	int flip;//标记
+	//每个Node有s,v和flip标记,三个成员  
 	Node(){}
 	Node(int v, Node* null):v(v) {
-		s = v+1;//可以这里为1，后面maintain 
+		s = 1;
 		ch[0] = ch[1] = null;
 		flip = 0;
 	}
 	int cmp(int x) const {//比较的是位序 
 		int ss = ch[0]->s;
-		if (x == ss+1) return -1;
-		return x < ss+1 ? 0 : 1;
+		if (x == ss + 1) return -1;
+		return x < ss + 1 ? 0 : 1;
 	}
 	void maintain() {
 		s = 1;
@@ -47,7 +54,7 @@ void build(Node* &o, int n) {
 	if (n >= 0) {//虚拟节点0
 		o = new Node(n, null);
 		build(o->ch[0], n-1);
-//		o->maintain();前面v+1这里就不用maintain了 
+		o->maintain();
 	}
 }
 
@@ -68,7 +75,8 @@ void rotate(Node* &o, int d) {
 	o = k;
 }
 
-void push_down(Node * &o) {
+//如果该节点有标记，则执行操作并下放标记 
+void pushDown(Node * &o) {
 	if (o->flip) {
 		o->flip = 0;
 		swap(o->ch[0], o->ch[1]);
@@ -77,13 +85,14 @@ void push_down(Node * &o) {
 	}
 }
 
+//将左数第k个元素旋转到根（不改变中序遍历/保持原本的大小关系）
 void splay(Node * &o, int k) {
-	push_down(o);//
+	pushDown(o);//
 	int d = o->cmp(k);
 	if (d == 1) k -= o->ch[0]->s + 1;
 	if (d != -1) {
 		Node *p = o->ch[d];
-		push_down(p);//
+		pushDown(p);//
 		int d2 = p->cmp(k);
 		int k2 = (d2 == 0 ? k : k - p->ch[0]->s - 1);
 		if (d2 != -1) {
@@ -95,14 +104,17 @@ void splay(Node * &o, int k) {
 	}
 }
 
-Node* merge(Node* left, Node* right) {//合并left和right。注意这里假定了left的所有元素比right小。
+//合并left和right。假设left的所有元素比right小。注意：right可以为null，left不可以
+Node* merge(Node* left, Node* right) {。
 	splay(left, left->s);
 	left->ch[1] = right;
 	left->maintain();
 	return left;
 }
 
-void split(Node* o, int k, Node* &left, Node* &right) {//把o的前k小的节点放在left里，其他的放在right里。当k=o->s时，right = NULL
+//把第k小的元素伸展到根，然后断开树根及其右子树的连接关系 
+//把o的前k小的节点放在left里（包括一个虚拟节点），其他的放在right里。当k=o->s时，right = NULL
+void split(Node* o, int k, Node* &left, Node* &right) {
 	splay(o, k);
 	left = o;
 	right = o->ch[1];
@@ -112,7 +124,7 @@ void split(Node* o, int k, Node* &left, Node* &right) {//把o的前k小的节点放在lef
 
 void print(Node* root) {
 	if (root == null) return;
-	push_down(root);
+	pushDown(root);
 	print(root->ch[0]);
 	if (root->v > 0) cout << root->v << endl;
 	print(root->ch[1]);

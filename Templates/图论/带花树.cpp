@@ -1,128 +1,126 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
-
+#include <queue>
 using namespace std;
-const int N=510;
 
-int n, head, tail, Start, Finish;
-int link[N];     //表示哪个点匹配了哪个点
-int Father[N];   //这个就是增广路的Father……但是用起来太精髓了
-int Base[N];     //该点属于哪朵花
-int Q[N];
-bool mark[N];
-bool map[N][N];
-bool InBlossom[N];
-bool in_Queue[N];
-int x[N], y[N], m;
+const int N = 250;
 
-void CreateGraph(){
-    int x,y;
-    scanf("%d", &n);
-    while (scanf("%d%d", &x, &y) != EOF) {
-    	map[x][y] = map[y][x] = 1;//从1开始 
+// 并查集维护
+int belong[N];
+int findb(int x) { 
+	return belong[x] == x ? x : belong[x] = findb(belong[x]);
+}
+void unit(int a, int b) {
+	a = findb(a);
+	b = findb(b);
+	if (a != b) belong[a] = b;
+}
+
+int n, match[N];
+vector<int> e[N];
+int Q[N], rear;
+int next[N], mark[N], vis[N];
+
+// 朴素算法求某阶段中搜索树上两点x, y的最近公共祖先r
+int LCA(int x, int y) {
+	static int t = 0; t++;
+	while (true) {
+		if (x != -1) {
+			x = findb(x); // 点要对应到对应的花上去
+			if (vis[x] == t) return x;
+			vis[x] = t;
+			if (match[x] != -1) x = next[match[x]];
+			else x = -1;
+		}
+		swap(x, y);
 	}
 }
 
-void BlossomContract(int x,int y){
-    fill(mark,mark+n+1,false);
-    fill(InBlossom,InBlossom+n+1,false);
-    #define pre Father[link[i]]
-    int lca,i;
-    for (i=x;i;i=pre) {i=Base[i]; mark[i]=true; }
-    for (i=y;i;i=pre) {i=Base[i]; if (mark[i]) {lca=i; break;} }  //寻找lca之旅……一定要注意i=Base[i]
-    for (i=x;Base[i]!=lca;i=pre){
-        if (Base[pre]!=lca) Father[pre]=link[i]; //对于BFS树中的父边是匹配边的点，Father向后跳
-        InBlossom[Base[i]]=true;
-        InBlossom[Base[link[i]]]=true;
-    }
-    for (i=y;Base[i]!=lca;i=pre){
-        if (Base[pre]!=lca) Father[pre]=link[i]; //同理
-        InBlossom[Base[i]]=true;
-        InBlossom[Base[link[i]]]=true;
-    }
+void group(int a, int p) {
+	while (a != p) {
+		int b = match[a], c = next[b];
 
-    #undef pre
-    if (Base[x]!=lca) Father[x]=y;     //注意不能从lca这个奇环的关键点跳回来
-    if (Base[y]!=lca) Father[y]=x;
-    for (i=1;i<=n;i++)
-      if (InBlossom[Base[i]]){
-          Base[i]=lca;
-          if (!in_Queue[i]){
-              Q[++tail]=i;
-              in_Queue[i]=true;     //要注意如果本来连向BFS树中父结点的边是非匹配边的点，可能是没有入队的
-          }
-      }
+		// next数组是用来标记花朵中的路径的，综合match数组来用，实际上形成了
+		// 双向链表，如(x, y)是匹配的，next[x]和next[y]就可以指两个方向了。
+		if (findb(c) != p) next[c] = b;
+
+		// 奇环中的点都有机会向环外找到匹配，所以都要标记成S型点加到队列中去，
+		// 因环内的匹配数已饱和，因此这些点最多只允许匹配成功一个点，在aug中
+		// 每次匹配到一个点就break终止了当前阶段的搜索，并且下阶段的标记是重
+		// 新来过的，这样做就是为了保证这一点。
+		if (mark[b] == 2) mark[Q[rear++] = b] = 1;
+		if (mark[c] == 2) mark[Q[rear++] = c] = 1;
+
+		unit(a, b); unit(b, c);
+		a = c;
+	}
 }
 
-void Change(){
-    int x,y,z;
-    z=Finish;
-    while (z){
-        y=Father[z];
-        x=link[y];
-        link[y]=z;
-        link[z]=y;
-        z=x;
-    }
+// 增广
+void aug(int s) {
+	for (int i = 0; i < n; i++) // 每个阶段都要重新标记
+		next[i] = -1, belong[i] = i, mark[i] = 0, vis[i] = -1;
+	mark[s] = 1;
+	Q[0] = s; rear = 1; 
+	for (int front = 0; match[s] == -1 && front < rear; front++) {
+		int x = Q[front]; // 队列Q中的点都是S型的
+		for (int i = 0; i < (int)e[x].size(); i++) {
+			int y = e[x][i];
+			if (match[x] == y) continue; // x与y已匹配，忽略
+			if (findb(x) == findb(y)) continue; // x与y同在一朵花，忽略
+			if (mark[y] == 2) continue; // y是T型点，忽略
+			if (mark[y] == 1) { // y是S型点，奇环缩点
+				int r = LCA(x, y); // r为从i和j到s的路径上的第一个公共节点
+				if (findb(x) != r) next[x] = y; // r和x不在同一个花朵，next标记花朵内路径
+				if (findb(y) != r) next[y] = x; // r和y不在同一个花朵，next标记花朵内路径
+
+				// 将整个r -- x - y --- r的奇环缩成点，r作为这个环的标记节点，相当于论文中的超级节点
+				group(x, r); // 缩路径r --- x为点
+				group(y, r); // 缩路径r --- y为点
+			}
+			else if (match[y] == -1) { // y自由，可以增广，R12规则处理
+				next[y] = x;
+				for (int u = y; u != -1; ) { // 交叉链取反
+					int v = next[u];
+					int mv = match[v];
+					match[v] = u, match[u] = v;
+					u = mv;
+				}
+				break; // 搜索成功，退出循环将进入下一阶段
+			}
+			else { // 当前搜索的交叉链+y+match[y]形成新的交叉链，将match[y]加入队列作为待搜节点
+				next[y] = x;
+				mark[Q[rear++] = match[y]] = 1; // match[y]也是S型的
+				mark[y] = 2; // y标记成T型
+			}
+		}
+	}
 }
 
-void FindAugmentPath(){
-    fill(Father,Father+n+1,0);
-    fill(in_Queue,in_Queue+n+1,false);
-    for (int i=1;i<=n;i++) Base[i]=i;
-    head=0; tail=1;
-    Q[1]=Start;
-    in_Queue[Start]=1;
-    while (head!=tail){
-        int x=Q[++head];
-        for (int y=1;y<=n;y++)
-          if (map[x][y] && Base[x]!=Base[y] && link[x]!=y)   //无意义的边
-            if ( Start==y || link[y] && Father[link[y]] )    //精髓地用Father表示该点是否
-                BlossomContract(x,y);
-            else if (!Father[y]){
-                Father[y]=x;
-                if (link[y]){
-                    Q[++tail]=link[y];
-                    in_Queue[link[y]]=true;
-                }
-                else{
-                    Finish=y;
-                    Change();
-                    return;
-                }
-            }
-    }
-}
+bool g[N][N];
+int main() {
+	scanf("%d", &n);
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++) g[i][j] = false;
 
-void Edmonds(){
-    memset(link,0,sizeof(link));
-    for (Start=1;Start<=n;Start++)
-      if (link[Start]==0)
-    	FindAugmentPath();
-}
+	// 建图，双向边
+	int x, y; while (scanf("%d%d", &x, &y) != EOF) {
+		x--, y--;
+		if (x != y && !g[x][y])
+			e[x].push_back(y), e[y].push_back(x);
+		g[x][y] = g[y][x] = true;
+	}
 
-void output(){
-    fill(mark,mark+n+1,false);
-    int cnt=0;
-    for (int i=1;i<=n;i++)
-    	if (link[i]) cnt++;
-    printf("%d\n",cnt);//注意 
-    for (int i=1;i<=n;i++)
-    	if (!mark[i] && link[i]){
-        	mark[i]=true;
-        	mark[link[i]]=true;
-        	printf("%d %d\n",i,link[i]);
-    	}
-}
+	// 增广匹配
+	for (int i = 0; i < n; i++) match[i] = -1;
+	for (int i = 0; i < n; i++) if (match[i] == -1) aug(i);
 
-int main(){
-	#ifdef LOCAL
-    freopen("in.txt","r",stdin);
-    #endif
-    	CreateGraph();
-	  Edmonds();
-    output();
-    return 0;
+	// 输出答案
+	int tot = 0;
+	for (int i = 0; i < n; i++) if (match[i] != -1) tot++;
+	printf("%d\n", tot);
+	for (int i = 0; i < n; i++) if (match[i] > i)
+		printf("%d %d\n", i + 1, match[i] + 1);
+	return 0;
 }
