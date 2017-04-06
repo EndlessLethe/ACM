@@ -430,6 +430,15 @@ struct cmp{
         return a.x> b.x; }
 };
 
+//像上面只有两个参数的，还可以这样
+typedef pair<int, int> P;
+priority_queue<P, vector<P>, greater<P> > que;
+que.push(P(val1, val2));
+P temp = que.top();
+que.pop();
+cout << temp.first << endl;
+//如上所示
+
 int main(){
     priority_queue<Node, vector<Node>, cmp> q;
     for(int i= 0; i< 10; ++i)
