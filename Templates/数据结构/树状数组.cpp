@@ -1,6 +1,6 @@
 //读入从1开始 
 //注意每次初始化b 
-//i~j区间求sum是sum(i)-sum(i-1) 
+//i~j区间求sum是sum(j)-sum(i-1) 
 
 const int MAX_N = 500100;
 

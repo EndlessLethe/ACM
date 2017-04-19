@@ -77,11 +77,9 @@ s.end()
 s.sort(v.begin(),v.end())
 使数组排序
 ```
-#include<iostream>
-#include<vector>
-#include<algorithm>
+#include <vector>
+#include <iostream>
 using namespace std;
-
 bool Comp(const int &a,const int &b) {
     return a>b;
 }
@@ -102,15 +100,15 @@ int main() {
 }
 ```
 
-s.insert(it, x)
+v.insert(it, x)
 向迭代器it指向的元素前插入新元素val。
-s.insert(it, n, x)
+v.insert(it, n, x)
 向迭代器it指向的元素前插入n个x。
-s.insert(it, first, last)
+v.insert(it, first, last)
 将由迭代器first和last所指定的序列[first, last)插入到迭代器it指向的元素前面。
-s.erase(it)
+v.erase(it)
 删除由迭代器it所指向的元素。
-s.erase(first, last)
+v.erase(first, last)
 删除由迭代器first和last所指定的序列[first, last)。
 ```
 vector<int>::iterator itor;  
@@ -124,17 +122,17 @@ for(itor=array.begin(); itor != array.end(); itor++) {
 去除vector中值为6的数据。  
 执行erase后itor会自动+1，所以需要itor--
 
-s.reserve(n)
+v.reserve(n)
 预分配缓冲空间，使存储空间至少可容纳n个元素。
-s.resize(n)
+v.resize(n)
 改变序列的长度，超出的元素将会被删除，如果序列需要扩展（原空间小于n），元素默认值将填满扩展出的空间。
-s.resize(n, val)
+v.resize(n, val)
 改变序列的长度，超出的元素将会被删除，如果序列需要扩展（原空间小于n），将用val填满扩展出的空间。
-s.clear()
+v.clear()
 删除容器中的所有的元素。
-s.swap(v)
+v.swap()
 将s与另一个vector对象v进行交换。
-s.assign(first, last)
+v.assign(first, last)
 将序列替换成由迭代器first和last所指定的序列[first, last)。[first, last)不能是原序列中的一部分。
 要注意的是，resize操作和clear操作都是对表的有效元素进行的操作，但并不一定会改变缓冲空间的大小。
 
@@ -438,6 +436,18 @@ P temp = que.top();
 que.pop();
 cout << temp.first << endl;
 //如上所示
+//还可以这样
+struct Item {
+	int a, b, c;
+	bool operator < (const Item& v) const {
+		return a > v.a || (a == v.a && b > v.b);
+	}
+}
+
+Priority_queue<Item> pq;
+Item = pq.top();
+//
+
 
 int main(){
     priority_queue<Node, vector<Node>, cmp> q;
