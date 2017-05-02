@@ -3,7 +3,10 @@ int pa[MAX];
 int findSet (int x) {
 	return pa[x] != x ? pa[x] = findSet(pa[x]) : x;
 }
-//if (findSet(x) != findSet(y) {pa[findSet(y)] = findSet(x);} //unite过程 
+void unite() {
+	if (findSet(x) != findSet(y)) pa[findSet(y)] = findSet(x);
+}
+//if (findSet(x) != findSet(y)) pa[findSet(y)] = findSet(x); //unite过程 
 //以上是两行并查集 
 
 int p[MAX];

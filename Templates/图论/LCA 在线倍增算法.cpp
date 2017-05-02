@@ -1,3 +1,61 @@
+// LCA
+int pa[MAX_LOG_V][MAX_V];  // 向上走2^k步所到的节点（超过根时记为-1）
+int depth[MAX_V];              // 节点的深度
+ 
+//节点编号从0开始 
+void dfs(int v, int p, int d) {
+    pa[0][v] = p;
+    depth[v] = d;
+    for (int i = 0; i < G[v].size(); i++) {
+        if (G[v][i] != p)
+            dfs(G[v][i], v, d + 1);
+    }
+}
+ 
+// 预处理
+void init_lca(int V) {//init_lca(N) 
+    dfs(0, -1, 0);
+    // 预处理出pa
+    for (int k = 0; k + 1 < MAX_LOG_V; k++) {
+        for (int v = 0; v < V; v++) {
+            if (pa[k][v] < 0)
+                pa[k + 1][v] = -1;
+            else {
+                pa[k + 1][v] = pa[k][pa[k][v]];
+            }
+        }
+    }
+}
+ 
+// 计算u和v的LCA
+int lca(int u, int v) {
+    // 让u和v向上走到同一深度
+    if (depth[u] > depth[v]) swap(u, v);
+    for (int k = 0; k < MAX_LOG_V; k++) {
+    	//等同于if(deep[a]-(1<<j)>=deep[b]) 把deep[a]-[b]分解为2的幂累加的形式，即需要上调的次数 
+        if ((depth[v] - depth[u]) >> k & 1) {//i的二进制中,取第j+1位上的值
+            v = pa[k][v];
+        }
+    }
+    if (u == v) return u;
+    //利用二分搜索计算LCA 同理，一起上走
+    for (int k = MAX_LOG_V - 1; k >= 0; k--) {
+        if (pa[k][u] != pa[k][v]) {
+            u = pa[k][u];
+            v = pa[k][v];
+        }
+    }
+    return pa[0][u];
+}
+ 
+int dist(int u, int v) {
+    return depth[u] + depth[v] - 2 * depth[lca(u, v)];
+}
+
+//
+//示例程序 
+//
+
 /**
  * @Date:   19-Apr-2017
  * @Email:  809810527@qq.com
