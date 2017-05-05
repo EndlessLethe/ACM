@@ -21,19 +21,24 @@
 #include <stack>
 //#include <bits/stdc++.h>
 using namespace::std;
+#pragma comment(linker,"/STACK:102400000,102400000")
 #define INF 0x7fffffff
-#define MAXN 10010
-#define MAXM 10010
+#define MAXN 100010
+#define MAXM 100010
 #define P 1000003
+typedef long long ll;
 
 struct node{
 	int to, next;
 } e[MAXM*2];
-int len, sum, root, head[MAXN], f[MAXN], vis[MAXN], size[MAXN], d[MAXN], deep[MAXN];
-int mp[P], ans[2], W[MAXN], V[MAXN];
+int len, sum, root, head[MAXN], f[MAXN], vis[MAXN], size[MAXN];
+ll d[MAXN], deep[MAXN];
+//int mp[P+2];
+map<ll, int> mp;
+int ans[2], W[MAXN], V[MAXN];
 int n, K;
 
-long long ine[P];
+ll ine[P+2];
 void pre() {
     ine[1] = 1;
     for (int i  = 2; i < P; i++) {
@@ -94,7 +99,7 @@ void getans(int x, int y) {
 void dfs(int v, int fa) {
 	deep[++deep[0]] = d[v];//deep用来记录子树各点的信息
 	V[deep[0]] = v;
-	// printf("to %d %d %d %d\n", v, d[v], deep[0], V[deep[0]]);
+//	 printf("to v %d d[v] %d id %d fa %d\n", v, d[v], deep[0], fa);
 	for (int i = head[v]; i; i = e[i].next) {
 		if (e[i].to == fa || vis[e[i].to]) continue;
 		d[e[i].to] = d[v] * W[e[i].to] % P;
@@ -104,10 +109,14 @@ void dfs(int v, int fa) {
 
 //对于根的计算调用cal(v, 0);
 int cal(int v, int w) {
+//	printf("v clear %d\n", v);
+	mp.clear();
+//	for (map<int, int>::iterator it = mp.begin(); it != mp.end(); it++) printf("mp %d\n", (*it).first);
 	deep[0] = 0;
 	d[v] = w;
 	deep[++deep[0]] = d[v];//deep用来记录子树各点的信息
 	V[deep[0]] = v;
+	mp[1] = v;
 	for (int i = head[v]; i; i = e[i].next) {
 		if (vis[e[i].to]) continue;
 		d[e[i].to] = d[v] * W[e[i].to] % P;
@@ -115,15 +124,15 @@ int cal(int v, int w) {
 		dfs(e[i].to, v);
 		// printf("%d %d\n", tmp, deep[0]);
 		for (int j = tmp+1; j < deep[0]+1; j++) {
-			int tmp = mp[K*ine[W[v]*deep[j]%P]%P];
-			// printf("存在:%d 根:%d 乘积：%d 逆：%d\n",
-			// tmp, v, W[v]*deep[j], K*ine[W[v]*deep[j]%P]%P);
-			//deep[j]储存multi, mp储存对应multi的节点
-			if (tmp) getans(V[deep[j]], tmp);
+			ll tmp = K*ine[W[v]*deep[j]%P]%P;
+//			 printf("存在:%d 根:%d 点：%d 乘积：%d 逆：%d\n",
+//			 tmp, v, V[j], W[v]*deep[j], K*ine[W[v]*deep[j]%P]%P);
+			//deep[j]储存multi, mp储存对应multi的节点, V[j]储存deep对应的节点 
+			if (mp[tmp]) getans(V[j], mp[tmp]);
 		}
 		for (int j = tmp+1; j < deep[0]+1; j++) {
-			mp[deep[j]] = V[deep[j]];
-			// printf("push:%d %d\n", deep[j], V[deep[j]]);
+			mp[deep[j]] = V[j];
+//			 printf("push:%d %d\n", deep[j], V[j]);
 		}
 	}
 	return 0;
@@ -146,7 +155,6 @@ void init() {
 	ans[0] = INF, ans[1] = INF, root = 0, len = 0;
 	memset(head, 0, sizeof(head));
 	memset(vis, 0, sizeof(vis));
-	memset(mp, 0, sizeof(mp));
 }
 
 int main() {
@@ -157,10 +165,8 @@ int main() {
     #endif
 	int u, v;
 	pre();
-	while (1) {
+	while(scanf("%d%d",&n,&K) == 2) {
 		init();
-		n = read(), K = read();
-		if (n == 0 && K == 0) break;
 		for (int i = 1; i <= n; i++) {
 			W[i] = read();
 		}
