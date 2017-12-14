@@ -1,19 +1,19 @@
 //返回x的m次幂 p为模数 
+typedef ll ll;
+#define MOD xxxx
 
-long long fast_mod(long long x, long long m, long long p){
-    long long s = x;
-    long long ans = 1;
+ll fast_pow(ll x, ll m){
+    ll ans = 1;
     while (m) {
-        if (m & 1) ans = s * ans % p;
-        s = s * s % p;
+        if (m & 1) ans = s * ans % MOD;
+        s = s * s % MOD;
         m >>= 1;
     }
     return ans;
 }
 
-long long fast_mod(long long x, long long m){
-    long long s = x;
-    long long ans = 1;
+ll fast_pow(ll x, ll m){
+    ll ans = 1;
     while (m) {
         if (m & 1) ans = s * ans;
         s = s * s;
